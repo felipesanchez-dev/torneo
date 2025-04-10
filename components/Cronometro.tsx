@@ -21,16 +21,40 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
   const [secondSavedTime, setSecondSavedTime] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const formatTime = (seconds: number): string => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
   useEffect(() => {
-    const loadSavedTimes = async () => {
-      const first = await AsyncStorage.getItem("firstSavedTime");
-      const second = await AsyncStorage.getItem("secondSavedTime");
+    const loadSavedData = async () => {
+      const [first, second, final, isRunning, start] = await Promise.all([
+        AsyncStorage.getItem("firstSavedTime"),
+        AsyncStorage.getItem("secondSavedTime"),
+        AsyncStorage.getItem("finalTime"),
+        AsyncStorage.getItem("isActive"),
+        AsyncStorage.getItem("startTimestamp"),
+      ]);
 
       if (first) setFirstSavedTime(first);
       if (second) setSecondSavedTime(second);
+      if (final) setFinalTime(Number(final));
+
+      if (isRunning === "true" && start) {
+        const startTimestamp = parseInt(start);
+        const now = Date.now();
+        const secondsPassed = Math.floor((now - startTimestamp) / 1000);
+        setElapsed(secondsPassed);
+        setIsActive(true);
+      }
     };
-    loadSavedTimes();
+    loadSavedData();
   }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem("finalTime", finalTime.toString());
+  }, [finalTime]);
 
   useEffect(() => {
     if (isActive) {
@@ -43,6 +67,10 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
           return prev + 1;
         });
       }, 1000);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -53,28 +81,30 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
     if (elapsed >= finalTime && finalTime > 0) {
       setIsActive(false);
       const currentTime = formatTime(elapsed);
-
       const saveTime = async () => {
         if (!firstSavedTime) {
           setFirstSavedTime(currentTime);
           await AsyncStorage.setItem("firstSavedTime", currentTime);
-          // console.log("Primer tiempo guardado:", currentTime);
         } else if (!secondSavedTime) {
           setSecondSavedTime(currentTime);
           await AsyncStorage.setItem("secondSavedTime", currentTime);
-          // console.log("Segundo tiempo guardado:", currentTime);
         }
       };
-
       saveTime();
       setElapsed(0);
     }
   }, [elapsed]);
 
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  const startTimer = async () => {
+    const start = Date.now().toString();
+    await AsyncStorage.setItem("startTimestamp", start);
+    await AsyncStorage.setItem("isActive", "true");
+    setIsActive(true);
+  };
+
+  const pauseTimer = async () => {
+    await AsyncStorage.setItem("isActive", "false");
+    setIsActive(false);
   };
 
   const addOneMinute = () => {
@@ -97,16 +127,21 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
     setIsActive(false);
     setFirstSavedTime(null);
     setSecondSavedTime(null);
-    await AsyncStorage.removeItem("firstSavedTime");
-    await AsyncStorage.removeItem("secondSavedTime");
+    await AsyncStorage.multiRemove([
+      "firstSavedTime",
+      "secondSavedTime",
+      "startTimestamp",
+      "finalTime",
+      "isActive",
+    ]);
   };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.endTimeText}>Duracion del partido: 40'</Text>
-
+      <Text style={styles.endTimeText}>Duración del partido: 40'</Text>
       <Text style={styles.timerText}>{formatTime(elapsed)}</Text>
       <Text style={styles.endTimeText}>
-        Duracion de cada tiempo: {formatTime(finalTime)} min
+        Duración de cada tiempo: {formatTime(finalTime)}
       </Text>
 
       <View style={styles.buttonsContainer}>
@@ -134,17 +169,11 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       </View>
 
       {!isActive && elapsed === 0 ? (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => setIsActive(true)}
-        >
+        <TouchableOpacity style={styles.startButton} onPress={startTimer}>
           <Text style={styles.buttonText}>Iniciar</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity
-          style={styles.pauseButton}
-          onPress={() => setIsActive((prev) => !prev)}
-        >
+        <TouchableOpacity style={styles.pauseButton} onPress={pauseTimer}>
           <Text style={styles.buttonText}>
             {isActive ? "Pausar" : "Reanudar"}
           </Text>
@@ -161,11 +190,13 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
         </Text>
       </View>
       <TouchableOpacity style={styles.resetButton} onPress={resetTimer}>
-        <Text style={styles.buttonText}>Elimitar datos</Text>
+        <Text style={styles.buttonText}>Eliminar datos</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
+export default Cronometro;
 
 const styles = StyleSheet.create({
   container: {
@@ -270,5 +301,3 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-
-export default Cronometro;
