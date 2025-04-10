@@ -77,7 +77,9 @@ interface MatchEvent {
   minute: number;
   assistant?: string;
 }
-
+interface DatosBasicos {
+  class_list?: string[];
+}
 export default function GameScreen() {
   const authUsername = "admin";
   const authPassword = "g9wX YDBx p5vR jQ9i z5aa 9b5i";
@@ -125,6 +127,7 @@ export default function GameScreen() {
     date: "",
     league: "",
     season: "",
+    class_list: [],
     yellowCards: {
       local: 0,
       visitante: 0,
@@ -214,6 +217,7 @@ export default function GameScreen() {
             data.performance[visitorTeamId]?.[0]?.azul || 0
           ),
         },
+        class_list: [],
       });
 
       // Collect player IDs only for players who have participated in events
@@ -1249,6 +1253,17 @@ export default function GameScreen() {
     );
   }
 
+  //Funcion para llamar el nombre de la Liga
+  const getLeagueName = (class_list?: string[]): string => {
+    const leagueClass = class_list?.find((item) =>
+      item.startsWith("sp_league-")
+    );
+
+    return leagueClass
+      ? leagueClass.replace("sp_league-", "").replace(/-/g, " ")
+      : "MICROFUTBOL CAPITAL MUSICAL	";
+  };
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -1272,10 +1287,9 @@ export default function GameScreen() {
               />
             }
           >
-              <View style={styles.wrapper}>
-                <Cronometro />
-              </View>
-
+            <View style={styles.wrapper}>
+              <Cronometro />
+            </View>
 
             {/* Match Score */}
             <View style={styles.scoreCard}>
@@ -1637,9 +1651,10 @@ export default function GameScreen() {
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Liga:</Text>
                     <Text style={styles.infoValue}>
-                      {matchData.league || "No especificada"}
+                      {getLeagueName(matchData.class_list)}
                     </Text>
                   </View>
+
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Temporada:</Text>
                     <Text style={styles.infoValue}>
@@ -1648,7 +1663,7 @@ export default function GameScreen() {
                   </View>
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Duración:</Text>
-                    <Text style={styles.infoValue}>90 minutos</Text>
+                    <Text style={styles.infoValue}>40'</Text>
                   </View>
                 </View>
               </View>

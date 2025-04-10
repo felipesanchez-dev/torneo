@@ -22,15 +22,32 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const loadSavedTimes = async () => {
-      const first = await AsyncStorage.getItem("firstSavedTime");
-      const second = await AsyncStorage.getItem("secondSavedTime");
-
-      if (first) setFirstSavedTime(first);
-      if (second) setSecondSavedTime(second);
+    const loadTimerState = async () => {
+      try {
+        const stateString = await AsyncStorage.getItem("cronometroState");
+        if (stateString) {
+          const { elapsed: savedElapsed, finalTime: savedFinalTime } =
+            JSON.parse(stateString);
+          setElapsed(savedElapsed);
+          setFinalTime(savedFinalTime);
+        }
+      } catch (error) {}
     };
-    loadSavedTimes();
+    loadTimerState();
   }, []);
+
+  useEffect(() => {
+    const saveTimerState = async () => {
+      try {
+        const stateToSave = { elapsed, finalTime };
+        await AsyncStorage.setItem(
+          "cronometroState",
+          JSON.stringify(stateToSave)
+        );
+      } catch (error) {}
+    };
+    saveTimerState();
+  }, [elapsed, finalTime]);
 
   useEffect(() => {
     if (isActive) {
@@ -91,12 +108,21 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       setFinalTime((prev) => prev + Math.floor(minutesToAdd * 60));
     }
   };
-
+  const resetTimer = async () => {
+    setElapsed(0);
+    setIsActive(false);
+    setFirstSavedTime(null);
+    setSecondSavedTime(null);
+    await AsyncStorage.removeItem("firstSavedTime");
+    await AsyncStorage.removeItem("secondSavedTime");
+  };
   return (
     <View style={styles.container}>
+      <Text style={styles.endTimeText}>Duracion del partido: 40'</Text>
+
       <Text style={styles.timerText}>{formatTime(elapsed)}</Text>
       <Text style={styles.endTimeText}>
-        Tiempo del partido: {formatTime(finalTime)}
+        Duracion de cada tiempo: {formatTime(finalTime)} min
       </Text>
 
       <View style={styles.buttonsContainer}>
@@ -150,6 +176,9 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
           2️⃣ Segundo tiempo: {secondSavedTime || "Sin iniciar 2do tiempo"}
         </Text>
       </View>
+      <TouchableOpacity style={styles.resetButton} onPress={resetTimer}>
+        <Text style={styles.buttonText}>Elimitar datos</Text>
+      </TouchableOpacity>
     </View>
   );
 };
