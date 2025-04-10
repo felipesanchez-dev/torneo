@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Torneo MicroFutbol",
-    "slug": "Torneo MicroFutbol",
+    "name": "Torneos Futbol Base",
+    "slug": "torneo-microfutbol",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.felipesanchez.torneomicrofutbol"
@@ -39,7 +39,7 @@
       "typedRoutes": true
     },
     "eas": {
-      "projectId": "7254d3ee-7cdf-4283-879a-1ea609114183"
+      "projectId": "958142b3-dd13-43dc-a1ed-7ff6e5b97860"
     },
     "owner": "felipesanchez-dev",
     "extra": {
@@ -47,7 +47,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "0ce30c8e-d94f-4fa5-b85e-45f744fea9fe"
+        "projectId": "958142b3-dd13-43dc-a1ed-7ff6e5b97860"
       }
     }
   }

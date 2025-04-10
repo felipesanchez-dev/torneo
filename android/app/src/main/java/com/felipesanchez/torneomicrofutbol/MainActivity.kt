@@ -1,4 +1,4 @@
-package com.danny20157.torneosinterbarriales
+package com.felipesanchez.torneomicrofutbol
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

@@ -1,4 +1,4 @@
-package com.danny20157.torneosinterbarriales
+package com.felipesanchez.torneomicrofutbol
 
 import android.app.Application
 import android.content.res.Configuration
