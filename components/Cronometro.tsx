@@ -22,32 +22,15 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const loadTimerState = async () => {
-      try {
-        const stateString = await AsyncStorage.getItem("cronometroState");
-        if (stateString) {
-          const { elapsed: savedElapsed, finalTime: savedFinalTime } =
-            JSON.parse(stateString);
-          setElapsed(savedElapsed);
-          setFinalTime(savedFinalTime);
-        }
-      } catch (error) {}
-    };
-    loadTimerState();
-  }, []);
+    const loadSavedTimes = async () => {
+      const first = await AsyncStorage.getItem("firstSavedTime");
+      const second = await AsyncStorage.getItem("secondSavedTime");
 
-  useEffect(() => {
-    const saveTimerState = async () => {
-      try {
-        const stateToSave = { elapsed, finalTime };
-        await AsyncStorage.setItem(
-          "cronometroState",
-          JSON.stringify(stateToSave)
-        );
-      } catch (error) {}
+      if (first) setFirstSavedTime(first);
+      if (second) setSecondSavedTime(second);
     };
-    saveTimerState();
-  }, [elapsed, finalTime]);
+    loadSavedTimes();
+  }, []);
 
   useEffect(() => {
     if (isActive) {
@@ -108,6 +91,7 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       setFinalTime((prev) => prev + Math.floor(minutesToAdd * 60));
     }
   };
+
   const resetTimer = async () => {
     setElapsed(0);
     setIsActive(false);
