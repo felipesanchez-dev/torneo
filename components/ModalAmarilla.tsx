@@ -74,195 +74,226 @@ const YellowCardModal: React.FC<YellowCardModalProps> = ({
   }
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const fetchPlayers = async () => {
-      if (!isVisible) return
+      if (!isVisible) return;
 
-      setIsLoadingPlayers(true)
+      setIsLoadingPlayers(true);
       try {
-        const response = await fetch("https://luxoradevs.com/jp/wp-json/sportspress/v2/players")
+        const response = await fetch(
+          "https://torneosfutbolbase.com/wp-json/sportspress/v2/players"
+        );
 
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`)
+          throw new Error(`Error: ${response.status}`);
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!isMounted) return
+        if (!isMounted) return;
 
         if (Array.isArray(data)) {
-          const formattedData = []
+          const formattedData = [];
           for (let i = 0; i < data.length; i++) {
-            const item = data[i]
+            const item = data[i];
             if (item && item.id && item.title && item.title.rendered) {
               formattedData.push({
                 id: item.id,
                 label: item.title.rendered,
-              })
+              });
             }
           }
-          setPlayers(formattedData)
+          setPlayers(formattedData);
         } else {
-          console.error("Players data is not an array:", data)
-          setPlayers([])
+          console.error("Players data is not an array:", data);
+          setPlayers([]);
         }
       } catch (error) {
-        console.error("Error al obtener los jugadores:", error)
+        console.error("Error al obtener los jugadores:", error);
         if (isMounted) {
-          Alert.alert("Error", "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.", [{ text: "OK" }])
-          setPlayers([])
+          Alert.alert(
+            "Error",
+            "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.",
+            [{ text: "OK" }]
+          );
+          setPlayers([]);
         }
       } finally {
         if (isMounted) {
-          setIsLoadingPlayers(false)
+          setIsLoadingPlayers(false);
         }
       }
-    }
+    };
 
     if (isVisible) {
-      fetchPlayers()
+      fetchPlayers();
     }
 
     return () => {
-      isMounted = false
-    }
-  }, [isVisible])
+      isMounted = false;
+    };
+  }, [isVisible]);
 
   useEffect(() => {
     if (isVisible) {
-      resetDataForm()
+      resetDataForm();
     }
   }, [isVisible]);
 
-  const updateYellowCardData = async (team: Team, player: Player, cardMinute: number) => {
+  const updateYellowCardData = async (
+    team: Team,
+    player: Player,
+    cardMinute: number
+  ) => {
     if (!matchId) {
-      console.error("No match ID provided")
-      return false
+      console.error("No match ID provided");
+      return false;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       // Fetch current match data to get teams structure and current performance data
-      const getResponse = await fetch(`https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
-          "Content-Type": "application/json",
-        },
-      })
+      const getResponse = await fetch(
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!getResponse.ok) {
-        throw new Error(`Error fetching match data: ${getResponse.status}`)
+        throw new Error(`Error fetching match data: ${getResponse.status}`);
       }
 
-      const matchData = await getResponse.json()
+      const matchData = await getResponse.json();
 
       // Get existing performance data or initialize
-      const performance = matchData.performance || {}
-      const teamIdStr = team.id.toString()
-      const playerIdStr = player.id.toString()
+      const performance = matchData.performance || {};
+      const teamIdStr = team.id.toString();
+      const playerIdStr = player.id.toString();
 
       // Initialize team entry if it doesn't exist
       if (!performance[teamIdStr]) {
-        performance[teamIdStr] = {}
+        performance[teamIdStr] = {};
       }
 
       // Initialize player entry if it doesn't exist
       if (!performance[teamIdStr][playerIdStr]) {
-        performance[teamIdStr][playerIdStr] = {}
+        performance[teamIdStr][playerIdStr] = {};
       }
 
       // Initialize team totals entry if it doesn't exist
       if (!performance[teamIdStr]["0"]) {
-        performance[teamIdStr]["0"] = {}
+        performance[teamIdStr]["0"] = {};
       }
 
       // Get current yellow cards for the player or default to 0
-      let currentYellowCards = 0
-      let existingMinutes = []
+      let currentYellowCards = 0;
+      let existingMinutes = [];
 
       // Parse existing yellow cards data if it exists
       if (performance[teamIdStr][playerIdStr].yellowcards) {
         // Check if the yellowcards field already has minute information
-        const cardsMatch = performance[teamIdStr][playerIdStr].yellowcards.match(/^(\d+)(?:\s*\((.*)\))?$/)
+        const cardsMatch = performance[teamIdStr][
+          playerIdStr
+        ].yellowcards.match(/^(\d+)(?:\s*\((.*)\))?$/);
         if (cardsMatch) {
-          currentYellowCards = Number.parseInt(cardsMatch[1])
+          currentYellowCards = Number.parseInt(cardsMatch[1]);
           // Extract existing minutes if they exist
           if (cardsMatch[2]) {
-            existingMinutes = cardsMatch[2].split(", ").map((m: string) => m.replace("'", ""))
+            existingMinutes = cardsMatch[2]
+              .split(", ")
+              .map((m: string) => m.replace("'", ""));
           }
         } else {
           // If no match, just try to parse as a number
-          currentYellowCards = Number.parseInt(performance[teamIdStr][playerIdStr].yellowcards) || 0
+          currentYellowCards =
+            Number.parseInt(performance[teamIdStr][playerIdStr].yellowcards) ||
+            0;
         }
       }
 
       // Add the new minute to the list
-      existingMinutes.push(cardMinute.toString())
+      existingMinutes.push(cardMinute.toString());
 
       // Format the yellowcards field with count and minutes
-      performance[teamIdStr][playerIdStr].yellowcards = `${currentYellowCards + 1} (${existingMinutes.join("', ")}')`
+      performance[teamIdStr][playerIdStr].yellowcards = `${
+        currentYellowCards + 1
+      } (${existingMinutes.join("', ")}')`;
 
       // Get current team yellow cards or default to 0
-      let currentTeamYellowCards = 0
-      let teamExistingMinutes = []
+      let currentTeamYellowCards = 0;
+      let teamExistingMinutes = [];
 
-      // Parse existing team yellow cards data if it exists 
+      // Parse existing team yellow cards data if it exists
       if (performance[teamIdStr]["0"].yellowcards) {
         // Check if the yellowcards field already has minute information
-        const teamCardsMatch = performance[teamIdStr]["0"].yellowcards.match(/^(\d+)(?:\s*\((.*)\))?$/)
+        const teamCardsMatch = performance[teamIdStr]["0"].yellowcards.match(
+          /^(\d+)(?:\s*\((.*)\))?$/
+        );
         if (teamCardsMatch) {
-          currentTeamYellowCards = Number.parseInt(teamCardsMatch[1])
+          currentTeamYellowCards = Number.parseInt(teamCardsMatch[1]);
           // Extract existing minutes if they exist
           if (teamCardsMatch[2]) {
-            teamExistingMinutes = teamCardsMatch[2].split(", ").map((m: string) => m.replace("'", ""))
+            teamExistingMinutes = teamCardsMatch[2]
+              .split(", ")
+              .map((m: string) => m.replace("'", ""));
           }
         } else {
           // If no match, just try to parse as a number
-          currentTeamYellowCards = Number.parseInt(performance[teamIdStr]["0"].yellowcards) || 0
+          currentTeamYellowCards =
+            Number.parseInt(performance[teamIdStr]["0"].yellowcards) || 0;
         }
       }
 
       // Add the new minute to the team's list
-      teamExistingMinutes.push(cardMinute.toString())
+      teamExistingMinutes.push(cardMinute.toString());
 
       // Format the yellowcards field with count and minutes for the team
-      performance[teamIdStr]["0"].yellowcards = `${currentTeamYellowCards + 1} (${teamExistingMinutes.join("', ")}')`
+      performance[teamIdStr]["0"].yellowcards = `${
+        currentTeamYellowCards + 1
+      } (${teamExistingMinutes.join("', ")}')`;
 
       // Prepare the update payload with the specified structure
       const updatePayload = {
         performance: performance,
-      }
+      };
 
       // Send the update request
-      const updateResponse = await fetch(`https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`, {
-        method: "POST",
-        headers: {
-          Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatePayload),
-      })
+      const updateResponse = await fetch(
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatePayload),
+        }
+      );
 
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
-        throw new Error(`Error updating match data: ${updateResponse.status}`)
+        throw new Error(`Error updating match data: ${updateResponse.status}`);
       }
-      return true
+      return true;
     } catch (error) {
-      console.error("Error updating yellow card data:", error)
+      console.error("Error updating yellow card data:", error);
       Alert.alert(
         "Error",
         "No se pudo actualizar los datos de tarjeta amarilla en el servidor. La tarjeta se registrará localmente.",
-        [{ text: "OK" }],
-      )
-      return false
+        [{ text: "OK" }]
+      );
+      return false;
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleAddYellowCard = async () => {
     if (!selectedTeamId) {

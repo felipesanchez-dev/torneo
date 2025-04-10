@@ -92,15 +92,6 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
     }
   };
 
-  const resetTimer = async () => {
-    setElapsed(0);
-    setIsActive(false);
-    setFirstSavedTime(null);
-    setSecondSavedTime(null);
-    await AsyncStorage.removeItem("firstSavedTime");
-    await AsyncStorage.removeItem("secondSavedTime");
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.timerText}>{formatTime(elapsed)}</Text>
@@ -149,10 +140,6 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
           </Text>
         </TouchableOpacity>
       )}
-
-      <TouchableOpacity style={styles.resetButton} onPress={resetTimer}>
-        <Text style={styles.buttonText}>Elimitar datos</Text>
-      </TouchableOpacity>
 
       <View style={styles.savedContainer}>
         <Text style={styles.savedTitle}>Tiempos guardados:</Text>

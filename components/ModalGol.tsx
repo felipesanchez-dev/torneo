@@ -82,79 +82,89 @@ const GoalModal: React.FC<GoalModalProps> = ({ isVisible, onClose, onAddGoal, cu
   }
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const fetchPlayers = async () => {
-      if (!isVisible) return
+      if (!isVisible) return;
 
-      setIsLoadingPlayers(true)
+      setIsLoadingPlayers(true);
       try {
-        const response = await fetch("https://luxoradevs.com/jp/wp-json/sportspress/v2/players")
+        const response = await fetch(
+          "https://torneosfutbolbase.com/wp-json/sportspress/v2/players"
+        );
 
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`)
+          throw new Error(`Error: ${response.status}`);
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!isMounted) return
+        if (!isMounted) return;
 
         if (Array.isArray(data)) {
-          const formattedData = []
+          const formattedData = [];
           for (let i = 0; i < data.length; i++) {
-            const item = data[i]
+            const item = data[i];
             if (item && item.id && item.title && item.title.rendered) {
               formattedData.push({
                 id: item.id,
                 label: item.title.rendered,
-              })
+              });
             }
           }
-          setPlayers(formattedData)
+          setPlayers(formattedData);
         } else {
-          console.error("Players data is not an array:", data)
-          setPlayers([])
+          console.error("Players data is not an array:", data);
+          setPlayers([]);
         }
       } catch (error) {
-        console.error("Error al obtener los jugadores:", error)
+        console.error("Error al obtener los jugadores:", error);
         if (isMounted) {
-          Alert.alert("Error", "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.", [{ text: "OK" }])
-          setPlayers([])
+          Alert.alert(
+            "Error",
+            "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.",
+            [{ text: "OK" }]
+          );
+          setPlayers([]);
         }
       } finally {
         if (isMounted) {
-          setIsLoadingPlayers(false)
+          setIsLoadingPlayers(false);
         }
       }
-    }
+    };
 
     if (isVisible) {
-      fetchPlayers()
+      fetchPlayers();
     }
 
     return () => {
-      isMounted = false
-    }
-  }, [isVisible])
+      isMounted = false;
+    };
+  }, [isVisible]);
 
   // Reset form cuando el modal se hace visible
   useEffect(() => {
     if (isVisible) {
-      resetDataForm()
+      resetDataForm();
     }
-  }, [isVisible])
+  }, [isVisible]);
 
-  const updateMatchData = async (team: Team, scorer: Player, assistant: Player | null) => {
+  const updateMatchData = async (
+    team: Team,
+    scorer: Player,
+    assistant: Player | null
+  ) => {
     if (!matchId) {
-      return false
+      return false;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       // Fetch current match data first to get existing goals
       const getResponse = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
         {
           method: "GET",
           headers: {
@@ -426,7 +436,7 @@ const GoalModal: React.FC<GoalModalProps> = ({ isVisible, onClose, onAddGoal, cu
 
       // Send the update request
       const updateResponse = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
         {
           method: "POST",
           headers: {
@@ -443,17 +453,17 @@ const GoalModal: React.FC<GoalModalProps> = ({ isVisible, onClose, onAddGoal, cu
 
       return true;
     } catch (error) {
-      console.error("Error updating match data:", error)
+      console.error("Error updating match data:", error);
       Alert.alert(
         "Error",
         "No se pudo actualizar los datos del partido en el servidor. El gol se registrará localmente.",
-        [{ text: "OK" }],
-      )
-      return false
+        [{ text: "OK" }]
+      );
+      return false;
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleAddGoal = async () => {
     if (!selectedTeamId) {

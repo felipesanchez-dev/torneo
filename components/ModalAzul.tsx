@@ -106,7 +106,7 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
       setIsLoadingPlayers(true);
       try {
         const response = await fetch(
-          "https://luxoradevs.com/jp/wp-json/sportspress/v2/players"
+          "https://torneosfutbolbase.com/wp-json/sportspress/v2/players"
         );
 
         if (!response.ok) {
@@ -180,7 +180,7 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
     try {
       // Fetch current match data to get the current blue cards count
       const getResponse = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
         {
           method: "GET",
           headers: {
@@ -290,7 +290,7 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
 
       // Send the update request
       const updateResponse = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
         {
           method: "POST",
           headers: {

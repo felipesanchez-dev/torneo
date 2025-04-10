@@ -167,7 +167,7 @@ export default function GameScreen() {
       setLoading(true);
       setEventsLoading(true); // Set events loading to true
       const response = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${parsedMatchId}`
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${parsedMatchId}`
       );
 
       if (!response.ok) {
@@ -283,7 +283,7 @@ export default function GameScreen() {
       for (const playerId of activePlayerIds) {
         try {
           const playerResponse = await fetch(
-            `https://luxoradevs.com/jp/wp-json/sportspress/v2/players/${playerId}`
+            `https://torneosfutbolbase.com/wp-json/sportspress/v2/players/${playerId}`
           );
           if (playerResponse.ok) {
             const playerData = await playerResponse.json();
@@ -1181,7 +1181,7 @@ export default function GameScreen() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${matchId}`,
         {
           method: "POST",
           headers: {

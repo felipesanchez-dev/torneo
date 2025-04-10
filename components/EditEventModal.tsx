@@ -40,7 +40,9 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ isVisible, onClose, eve
       const fetchPlayers = async () => {
         setIsLoadingPlayers(true)
         try {
-          const response = await fetch("https://luxoradevs.com/jp/wp-json/sportspress/v2/players")
+          const response = await fetch(
+            "https://torneosfutbolbase.com/wp-json/sportspress/v2/players"
+          );
           if (!response.ok) {
             throw new Error(`Error: ${response.status}`)
           }

@@ -27,7 +27,7 @@ export default function VersusScreen() {
     try {
       // Fetch events
       const eventsResponse = await fetch(
-        "https://luxoradevs.com/jp/wp-json/sportspress/v2/events"
+        "https://torneosfutbolbase.com/wp-json/sportspress/v2/events"
       );
 
       if (!eventsResponse.ok) {
