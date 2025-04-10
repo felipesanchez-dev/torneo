@@ -26,16 +26,18 @@ export default function VersusScreen() {
   const fetchEvents = async () => {
     try {
       // Fetch events
-      const eventsResponse = await fetch('https://luxoradevs.com/jp/wp-json/sportspress/v2/events');
-      
+      const eventsResponse = await fetch(
+        "https://luxoradevs.com/jp/wp-json/sportspress/v2/events"
+      );
+
       if (!eventsResponse.ok) {
         throw new Error(`API responded with status: ${eventsResponse.status}`);
       }
-      
+
       const eventsData = await eventsResponse.json();
-      
+
       if (!Array.isArray(eventsData) || eventsData.length === 0) {
-        setError('No se pudieron cargar los partidos. Datos inválidos.');
+        setError("No se pudieron cargar los partidos. Datos inválidos.");
         setLoading(false);
         return;
       }
@@ -49,11 +51,11 @@ export default function VersusScreen() {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         })
         .slice(0, 5); // Limit to 4 events
-      
+
       setUpcomingEvents(events);
     } catch (error) {
-      console.error('Error al obtener los eventos:', error);
-      setError('Error al cargar los partidos. Intente nuevamente.');
+      console.error("Error al obtener los eventos:", error);
+      setError("Error al cargar los partidos. Intente nuevamente.");
     } finally {
       setLoading(false);
       setRefreshing(false); // Asegúrate de desactivar el estado de refresco
@@ -72,10 +74,10 @@ export default function VersusScreen() {
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch (e) {
       return dateString;
@@ -85,81 +87,83 @@ export default function VersusScreen() {
   const formatTime = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleTimeString('es-ES', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      return date.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
       });
     } catch (e) {
-      return '';
+      return "";
     }
   };
 
   const getTeamNames = (title: string) => {
     const cleanTitle = title.replace(/<\/?[^>]+(>|$)/g, "");
     const parts = cleanTitle.split(/\s+[vV][sS]\s+/);
-    
+
     if (parts.length === 2) {
       return {
         team1: parts[0].trim(),
-        team2: parts[1].trim()
+        team2: parts[1].trim(),
       };
     }
-    
+
     return {
       team1: cleanTitle,
-      team2: "Oponente"
+      team2: "Oponente",
     };
   };
 
   const handleStartMatch = (event: Event) => {
     const teamNames = getTeamNames(event.title.rendered);
-    
+
     const team1 = {
       id: event.teams[0],
-      label: teamNames.team1
+      label: teamNames.team1,
     };
-    
+
     const team2 = {
       id: event.teams[1],
-      label: teamNames.team2
+      label: teamNames.team2,
     };
-    
+
     router.push({
-      pathname: './game',
-      params: { 
-        team1: encodeURIComponent(JSON.stringify(team1)), 
+      pathname: "./game",
+      params: {
+        team1: encodeURIComponent(JSON.stringify(team1)),
         team2: encodeURIComponent(JSON.stringify(team2)),
-        matchId: event.id
-      }
+        matchId: event.id,
+      },
     });
   };
 
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <LinearGradient 
-        colors={['#FFDE00', '#E53935']} 
-        start={{ x: 0, y: 0 }} 
-        end={{ x: 0, y: 1 }} 
+      <LinearGradient
+        colors={["#FFDE00", "#E53935"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
         style={styles.container}
       >
         <View style={styles.overlay}>
-          <Image 
-            source={{ uri: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo%20Musicalia%2025%20amarillo-aME4BgXjwjZeMhPGO4eQcFFjdodPcW.png' }} 
-            style={styles.logo} 
-            resizeMode="contain" 
+          <Image
+            source={{
+              uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo%20Musicalia%2025%20amarillo-aME4BgXjwjZeMhPGO4eQcFFjdodPcW.png",
+            }}
+            style={styles.logo}
+            resizeMode="contain"
           />
-          
+
           <Text style={styles.title}>Próximos Partidos</Text>
-          
-          <ScrollView 
-            style={styles.scrollView} 
+
+          <ScrollView
+            style={styles.scrollView}
             contentContainerStyle={styles.scrollViewContent}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={['#FFDE00']} // Color del indicador de refresco
+                colors={["#FFDE00"]} // Color del indicador de refresco
                 tintColor="#FFDE00" // Color del indicador de refresco
               />
             }
@@ -174,16 +178,18 @@ export default function VersusScreen() {
               </View>
             ) : upcomingEvents.length === 0 ? (
               <View style={styles.noMatchesContainer}>
-                <Text style={styles.noMatchesText}>No hay partidos programados</Text>
+                <Text style={styles.noMatchesText}>
+                  No hay partidos programados
+                </Text>
               </View>
             ) : (
               upcomingEvents.map((event) => {
                 const teamNames = getTeamNames(event.title.rendered);
-                
+
                 return (
                   <LinearGradient
                     key={event.id}
-                    colors={['#FFFFFF', '#F9F9F9']}
+                    colors={["#FFFFFF", "#F9F9F9"]}
                     style={styles.matchCard}
                   >
                     <View style={styles.matchContent}>
@@ -192,7 +198,7 @@ export default function VersusScreen() {
                           {formatDate(event.date)} - {formatTime(event.date)}
                         </Text>
                       </View>
-                      
+
                       <View style={styles.matchDetails}>
                         <View style={styles.teamRow}>
                           <View style={styles.teamBadge}>
@@ -201,26 +207,22 @@ export default function VersusScreen() {
                             </Text>
                           </View>
                           <View style={styles.teamNameContainer}>
-                            <Text style={styles.teamName} adjustsFontSizeToFit={true} minimumFontScale={0.7}>
+                            <Text
+                              style={styles.teamName}
+                              adjustsFontSizeToFit={true}
+                              minimumFontScale={0.7}
+                            >
                               {teamNames.team1}
                             </Text>
                           </View>
                         </View>
-                        
+
                         <View style={styles.vsRow}>
                           <View style={styles.vsContainer}>
                             <Text style={styles.vsText}>VS</Text>
                           </View>
-                          {event.main_results && event.main_results.length === 2 && 
-                           event.main_results[0] !== "" && event.main_results[1] !== "" && (
-                            <View style={styles.scoreContainer}>
-                              <Text style={styles.scoreText}>
-                                {event.main_results[0]} - {event.main_results[1]}
-                              </Text>
-                            </View>
-                          )}
                         </View>
-                        
+
                         <View style={styles.teamRow}>
                           <View style={styles.teamBadge}>
                             <Text style={styles.teamInitial}>
@@ -228,19 +230,34 @@ export default function VersusScreen() {
                             </Text>
                           </View>
                           <View style={styles.teamNameContainer}>
-                            <Text style={styles.teamName} adjustsFontSizeToFit={true} minimumFontScale={0.7}>
+                            <Text
+                              style={styles.teamName}
+                              adjustsFontSizeToFit={true}
+                              minimumFontScale={0.7}
+                            >
                               {teamNames.team2}
                             </Text>
                           </View>
                         </View>
                       </View>
                     </View>
-                    
+                    {event.main_results &&
+                      event.main_results.length === 2 &&
+                      event.main_results[0] !== "" &&
+                      event.main_results[1] !== "" && (
+                        <View style={styles.scoreContainer}>
+                          <Text style={styles.scoreLabel}>MARCADOR</Text>
+                          <Text style={styles.scoreText}>
+                            {event.main_results[0]} - {event.main_results[1]}
+                          </Text>
+                        </View>
+                      )}
+
                     <TouchableOpacity
                       style={styles.startButton}
                       onPress={() => handleStartMatch(event)}
                     >
-                      <Text style={styles.startButtonText}>Abrir</Text>
+                      <Text style={styles.startButtonText}>Abir partido</Text>
                     </TouchableOpacity>
                   </LinearGradient>
                 );
@@ -256,198 +273,215 @@ export default function VersusScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: "#F9F9F9",
+    alignItems: "center",
+    justifyContent: "center",
   },
   overlay: {
     flex: 1,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 40,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
   logo: {
-    width: 180,
-    height: 120,
+    width: 200,
+    height: 130,
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#222222',
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textAlign: "center",
+    textShadowColor: "rgba(0, 0, 0, 0.1)",
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 2,
   },
   scrollView: {
-    width: '100%',
-    maxHeight: '70%',
+    width: "100%",
+    maxHeight: "70%",
   },
   scrollViewContent: {
     paddingBottom: 20,
   },
   matchCard: {
-    flexDirection: 'row',
-    borderRadius: 15,
-    marginBottom: 15,
-    padding: 15,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    ...(Platform.OS === "web"
-      ? { boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.15)"}
-      : {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      }
-    )
+    width: "100%",
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    marginBottom: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6,
   },
   matchContent: {
     flex: 1,
-    marginRight: 10,
+    alignItems: "center",
+    paddingVertical: 10,
   },
   dateTimeContainer: {
-    backgroundColor: '#FFDE00',
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
+    backgroundColor: "#FFDE00",
+    borderRadius: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    alignSelf: "center",
+    marginBottom: 15,
   },
   dateTime: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#222222',
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#222",
+    textAlign: "center",
   },
   matchDetails: {
-    width: '100%',
+    width: "100%",
+    marginTop: 10,
+    alignItems: "center",
   },
   teamRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 2,
+    backgroundColor: "rgba(0, 0, 0, 0.03)",
     borderRadius: 10,
-    padding: 5,
+    padding: 6,
   },
   teamBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#E53935',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#FFDE00',
-  },
-  teamInitial: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  teamNameContainer: {
-    flex: 1,
-    paddingRight: 5,
-  },
-  teamName: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#222222',
-  },
-  vsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  vsContainer: {
-    backgroundColor: '#E53935',
     width: 36,
     height: 36,
     borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E53935",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#FFDE00",
+  },
+  teamInitial: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  teamNameContainer: {
+    flex: 1,
+  },
+  teamName: {
+    textAlign: "center",
+    marginRight: 50,
+    fontSize: 25,
+    fontWeight: "600",
+    color: "#222",
+  },
+  vsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  vsContainer: {
+    backgroundColor: "#E53935",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#FFDE00',
+    borderColor: "#FFDE00",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
+    marginHorizontal: 6,
   },
   vsText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
   },
   scoreContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: "rgba(0, 0, 0, 0.08)",
     borderRadius: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginLeft: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: 15,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scoreLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#222",
+    textAlign: "center",
   },
   scoreText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222222',
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#222",
+    textAlign: "center",
+    marginTop: 5,
   },
   startButton: {
-    backgroundColor: '#009B3A', // Green from the logo
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    marginTop: 20,
+    backgroundColor: "#009B3A",
+    paddingVertical: 16,
+    width: "100%",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowRadius: 3,
   },
   startButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   loadingContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 15,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   loadingText: {
     fontSize: 16,
-    color: '#222222',
-    textAlign: 'center',
+    color: "#222",
+    textAlign: "center",
   },
   noMatchesContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 15,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   noMatchesText: {
     fontSize: 16,
-    color: '#222222',
-    textAlign: 'center',
+    color: "#222",
+    textAlign: "center",
   },
   errorContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 15,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   errorText: {
     fontSize: 16,
-    color: '#E53935',
-    textAlign: 'center',
+    color: "#E53935",
+    textAlign: "center",
   },
 });
