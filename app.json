@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "torneos-interbarriales",
-    "slug": "torneos-interbarriales",
+    "name": "Torneo MicroFutbol",
+    "slug": "torneo-microfutbol",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,19 +16,19 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.felipesanchez.torneosinterbarriales"
+      "package": "com.felipesanchez.torneomicrofutbol"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -38,14 +38,17 @@
     "experiments": {
       "typedRoutes": true
     },
+    "eas": {
+      "projectId": "7254d3ee-7cdf-4283-879a-1ea609114183"
+    },
+    "owner": "felipesanchez-dev",
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "7254d3ee-7cdf-4283-879a-1ea609114183"
+        "projectId": "0ce30c8e-d94f-4fa5-b85e-45f744fea9fe"
       }
-    },
-    "owner": "felipesanchez-dev"
+    }
   }
 }

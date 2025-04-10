@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
 import Loading from '@/components/ui/loading';
 
-// Define the event type based on the API response
 interface Event {
   id: number;
   title: {

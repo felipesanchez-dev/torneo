@@ -6,22 +6,22 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicat
 import { Picker } from "@react-native-picker/picker"
 
 type Team = {
-  id: number
-  label: string
-}
+  id: number;
+  label: string;
+};
 
 type Player = {
-  id: number
-  label: string
-}
+  id: number;
+  label: string;
+};
 
 interface BlueCardModalProps {
-  isVisible: boolean
-  onClose: () => void
-  onAddBlueCard: (team: Team, player: Player, minute: number) => void
-  currentMinute: number
-  teams: Team[]
-  matchId?: string
+  isVisible: boolean;
+  onClose: () => void;
+  onAddBlueCard: (team: Team, player: Player, minute: number) => void;
+  currentMinute: number;
+  teams: Team[];
+  matchId?: string;
 }
 
 const BlueCardModal: React.FC<BlueCardModalProps> = ({
@@ -32,305 +32,369 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
   teams,
   matchId = "",
 }) => {
-  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
-  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null)
-  const [players, setPlayers] = useState<Player[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoadingPlayers, setIsLoadingPlayers] = useState(false)
-  const [minute, setMinute] = useState<string>(currentMinute.toString())
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+  const [minute, setMinute] = useState<string>(currentMinute.toString());
 
   // Updated auth credentials
-  const authUsername = "admin"
-  const authPassword = "g9wX YDBx p5vR jQ9i z5aa 9b5i"
+  const authUsername = "admin";
+  const authPassword = "g9wX YDBx p5vR jQ9i z5aa 9b5i";
 
   // Render team items safely
   const renderTeamItems = () => {
-    const items = []
-    items.push(<Picker.Item key="default-team" label="Seleccione un equipo" value={null} />)
+    const items = [];
+    items.push(
+      <Picker.Item
+        key="default-team"
+        label="Seleccione un equipo"
+        value={null}
+      />
+    );
 
     if (teams && teams.length > 0) {
       for (let i = 0; i < teams.length; i++) {
-        const team = teams[i]
-        items.push(<Picker.Item key={`team-${team.id}`} label={team.label} value={team.id} />)
+        const team = teams[i];
+        items.push(
+          <Picker.Item
+            key={`team-${team.id}`}
+            label={team.label}
+            value={team.id}
+          />
+        );
       }
     }
 
-    return items
-  }
+    return items;
+  };
 
   // Render player items safely
   const renderPlayerItems = () => {
-    const items = []
-    items.push(<Picker.Item key="default-player" label="Seleccione un jugador" value={null} />)
+    const items = [];
+    items.push(
+      <Picker.Item
+        key="default-player"
+        label="Seleccione un jugador"
+        value={null}
+      />
+    );
 
     if (players && players.length > 0) {
       for (let i = 0; i < players.length; i++) {
-        const player = players[i]
-        items.push(<Picker.Item key={`player-${player.id}`} label={player.label} value={player.id} />)
+        const player = players[i];
+        items.push(
+          <Picker.Item
+            key={`player-${player.id}`}
+            label={player.label}
+            value={player.id}
+          />
+        );
       }
     }
 
-    return items
-  }
+    return items;
+  };
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const fetchPlayers = async () => {
-      if (!isVisible) return
+      if (!isVisible) return;
 
-      setIsLoadingPlayers(true)
+      setIsLoadingPlayers(true);
       try {
-        const response = await fetch("https://luxoradevs.com/jp/wp-json/sportspress/v2/players")
+        const response = await fetch(
+          "https://luxoradevs.com/jp/wp-json/sportspress/v2/players"
+        );
 
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`)
+          throw new Error(`Error: ${response.status}`);
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!isMounted) return
+        if (!isMounted) return;
 
         if (Array.isArray(data)) {
-          const formattedData = []
+          const formattedData = [];
           for (let i = 0; i < data.length; i++) {
-            const item = data[i]
+            const item = data[i];
             if (item && item.id && item.title && item.title.rendered) {
               formattedData.push({
                 id: item.id,
                 label: item.title.rendered,
-              })
+              });
             }
           }
-          setPlayers(formattedData)
+          setPlayers(formattedData);
         } else {
-          console.error("Players data is not an array:", data)
-          setPlayers([])
+          console.error("Players data is not an array:", data);
+          setPlayers([]);
         }
       } catch (error) {
-        console.error("Error al obtener los jugadores:", error)
+        console.error("Error al obtener los jugadores:", error);
         if (isMounted) {
-          Alert.alert("Error", "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.", [{ text: "OK" }])
-          setPlayers([])
+          Alert.alert(
+            "Error",
+            "No se pudieron cargar los jugadores. Por favor, inténtalo de nuevo.",
+            [{ text: "OK" }]
+          );
+          setPlayers([]);
         }
       } finally {
         if (isMounted) {
-          setIsLoadingPlayers(false)
+          setIsLoadingPlayers(false);
         }
       }
-    }
+    };
 
     if (isVisible) {
-      fetchPlayers()
+      fetchPlayers();
     }
 
     return () => {
-      isMounted = false
-    }
-  }, [isVisible])
+      isMounted = false;
+    };
+  }, [isVisible]);
 
   useEffect(() => {
     if (isVisible) {
-      resetDataForm()
+      resetDataForm();
     }
-  }, [isVisible])
+  }, [isVisible]);
 
-  const updateBlueCardData = async (team: Team, player: Player, cardMinute: number) => {
+  const updateBlueCardData = async (
+    team: Team,
+    player: Player,
+    cardMinute: number
+  ) => {
     if (!matchId) {
-      console.error("No match ID provided")
-      return false
+      console.error("No match ID provided");
+      return false;
     }
-  
-    setIsSubmitting(true)
-  
+
+    setIsSubmitting(true);
+
     try {
       // Fetch current match data to get the current blue cards count
-      const getResponse = await fetch(`https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
-          "Content-Type": "application/json",
-        },
-      })
-  
+      const getResponse = await fetch(
+        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (!getResponse.ok) {
-        throw new Error(`Error fetching match data: ${getResponse.status}`)
+        throw new Error(`Error fetching match data: ${getResponse.status}`);
       }
-  
-      const matchData = await getResponse.json()
-  
+
+      const matchData = await getResponse.json();
+
       // Get existing performance data or initialize
-      const performance = matchData.performance || {}
-      const teamIdStr = team.id.toString()
-      const playerIdStr = player.id.toString()
-  
+      const performance = matchData.performance || {};
+      const teamIdStr = team.id.toString();
+      const playerIdStr = player.id.toString();
+
       // Initialize team entry if it doesn't exist
       if (!performance[teamIdStr]) {
-        performance[teamIdStr] = {}
+        performance[teamIdStr] = {};
       }
-  
+
       // Initialize player entry if it doesn't exist
       if (!performance[teamIdStr][playerIdStr]) {
-        performance[teamIdStr][playerIdStr] = {}
+        performance[teamIdStr][playerIdStr] = {};
       }
-      
+
       // Initialize team totals entry if it doesn't exist
       if (!performance[teamIdStr]["0"]) {
-        performance[teamIdStr]["0"] = {}
+        performance[teamIdStr]["0"] = {};
       }
-  
+
       // Get current blue cards for the player or default to 0
-      let currentBlueCards = 0
-      let existingMinutes = []
-  
+      let currentBlueCards = 0;
+      let existingMinutes = [];
+
       // Parse existing blue cards data if it exists
       if (performance[teamIdStr][playerIdStr].azul) {
         // Check if the azul field already has minute information
-        const cardsMatch = performance[teamIdStr][playerIdStr].azul.match(/^(\d+)(?:\s*\((.*)\))?$/)
+        const cardsMatch = performance[teamIdStr][playerIdStr].azul.match(
+          /^(\d+)(?:\s*\((.*)\))?$/
+        );
         if (cardsMatch) {
-          currentBlueCards = Number.parseInt(cardsMatch[1])
+          currentBlueCards = Number.parseInt(cardsMatch[1]);
           // Extract existing minutes if they exist
           if (cardsMatch[2]) {
-            existingMinutes = cardsMatch[2].split(", ").map((m: string) => m.replace("'", ""))
+            existingMinutes = cardsMatch[2]
+              .split(", ")
+              .map((m: string) => m.replace("'", ""));
           }
         } else {
           // If no match, just try to parse as a number
-          currentBlueCards = Number.parseInt(performance[teamIdStr][playerIdStr].azul) || 0
+          currentBlueCards =
+            Number.parseInt(performance[teamIdStr][playerIdStr].azul) || 0;
         }
       }
-  
+
       // Add the new minute to the list
-      existingMinutes.push(cardMinute.toString())
-  
+      existingMinutes.push(cardMinute.toString());
+
       // Format the azul field with count and minutes
-      performance[teamIdStr][playerIdStr].azul = `${currentBlueCards + 1} (${existingMinutes.join("', ")}')`
-      
+      performance[teamIdStr][playerIdStr].azul = `${
+        currentBlueCards + 1
+      } (${existingMinutes.join("', ")}')`;
+
       // Get current team blue cards or default to 0
-      let currentTeamBlueCards = 0
-      let teamExistingMinutes = []
-  
-      // Parse existing team blue cards data if it exists 
+      let currentTeamBlueCards = 0;
+      let teamExistingMinutes = [];
+
+      // Parse existing team blue cards data if it exists
       if (performance[teamIdStr]["0"].azul) {
         // Check if the azul field already has minute information
-        const teamCardsMatch = performance[teamIdStr]["0"].azul.match(/^(\d+)(?:\s*\((.*)\))?$/)
+        const teamCardsMatch = performance[teamIdStr]["0"].azul.match(
+          /^(\d+)(?:\s*\((.*)\))?$/
+        );
         if (teamCardsMatch) {
-          currentTeamBlueCards = Number.parseInt(teamCardsMatch[1])
+          currentTeamBlueCards = Number.parseInt(teamCardsMatch[1]);
           // Extract existing minutes if they exist
           if (teamCardsMatch[2]) {
-            teamExistingMinutes = teamCardsMatch[2].split(", ").map((m: string) => m.replace("'", ""))
+            teamExistingMinutes = teamCardsMatch[2]
+              .split(", ")
+              .map((m: string) => m.replace("'", ""));
           }
         } else {
           // If no match, just try to parse as a number
-          currentTeamBlueCards = Number.parseInt(performance[teamIdStr]["0"].azul) || 0
+          currentTeamBlueCards =
+            Number.parseInt(performance[teamIdStr]["0"].azul) || 0;
         }
       }
-  
+
       // Add the new minute to the team's list
-      teamExistingMinutes.push(cardMinute.toString())
-  
+      teamExistingMinutes.push(cardMinute.toString());
+
       // Format the azul field with count and minutes for the team
-      performance[teamIdStr]["0"].azul = `${currentTeamBlueCards + 1} (${teamExistingMinutes.join("', ")}')`
-  
+      performance[teamIdStr]["0"].azul = `${
+        currentTeamBlueCards + 1
+      } (${teamExistingMinutes.join("', ")}')`;
+
       // Prepare the update payload with the specified structure
       const updatePayload = {
         performance: performance,
-      }
-      console.log("Update payload:", updatePayload);
-      
+      };
+      // console.log("Update payload:", updatePayload);
+
       // Send the update request
-      const updateResponse = await fetch(`https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`, {
-        method: "POST",
-        headers: {
-          Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatePayload),
-      })
-  
+      const updateResponse = await fetch(
+        `https://luxoradevs.com/jp/wp-json/sportspress/v2/events/${matchId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Basic " + btoa(`${authUsername}:${authPassword}`),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatePayload),
+        }
+      );
+
       if (!updateResponse.ok) {
-        const errorText = await updateResponse.text()
-        console.error("API error response:", errorText)
-        throw new Error(`Error updating match data: ${updateResponse.status}`)
+        const errorText = await updateResponse.text();
+        console.error("API error response:", errorText);
+        throw new Error(`Error updating match data: ${updateResponse.status}`);
       }
-  
-      return true
+
+      return true;
     } catch (error) {
-      console.error("Error updating blue card data:", error)
+      console.error("Error updating blue card data:", error);
       Alert.alert(
         "Error",
         "No se pudo actualizar los datos de tarjeta azul en el servidor. La tarjeta se registrará localmente.",
-        [{ text: "OK" }],
-      )
-      return false
+        [{ text: "OK" }]
+      );
+      return false;
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleAddBlueCard = async () => {
     if (!selectedTeamId) {
-      Alert.alert("Error", "Selecciona un equipo")
-      return
+      Alert.alert("Error", "Selecciona un equipo");
+      return;
     }
 
     if (!selectedPlayerId) {
-      Alert.alert("Error", "Selecciona un jugador")
-      return
+      Alert.alert("Error", "Selecciona un jugador");
+      return;
     }
 
     if (!minute || Number.parseInt(minute) <= 0) {
-      Alert.alert("Error", "Ingresa un minuto válido para la tarjeta")
-      return
+      Alert.alert("Error", "Ingresa un minuto válido para la tarjeta");
+      return;
     }
 
     // Find the selected team
-    let team: Team | undefined
+    let team: Team | undefined;
     if (teams && teams.length > 0) {
       for (let i = 0; i < teams.length; i++) {
         if (teams[i].id === selectedTeamId) {
-          team = teams[i]
-          break
+          team = teams[i];
+          break;
         }
       }
     }
 
     // Find the selected player
-    let player: Player | undefined
+    let player: Player | undefined;
     if (players && players.length > 0) {
       for (let i = 0; i < players.length; i++) {
         if (players[i].id === selectedPlayerId) {
-          player = players[i]
-          break
+          player = players[i];
+          break;
         }
       }
     }
 
     if (!team || !player) {
-      Alert.alert("Error", "Error al encontrar el equipo o jugador seleccionado")
-      return
+      Alert.alert(
+        "Error",
+        "Error al encontrar el equipo o jugador seleccionado"
+      );
+      return;
     }
 
-    const cardMinute = Number.parseInt(minute)
+    const cardMinute = Number.parseInt(minute);
 
     // First update the server
-    const serverUpdateSuccess = await updateBlueCardData(team, player, cardMinute)
+    const serverUpdateSuccess = await updateBlueCardData(
+      team,
+      player,
+      cardMinute
+    );
 
     // Then update local state with the correct team and minute
-    onAddBlueCard(team, player, cardMinute)
-    resetDataForm()
-    onClose()
+    onAddBlueCard(team, player, cardMinute);
+    resetDataForm();
+    onClose();
 
     // Show success message if server update was successfwul
     if (serverUpdateSuccess) {
-      Alert.alert("Éxito", "Tarjeta azul registrada correctamente en el servidor")
+      Alert.alert(
+        "Éxito",
+        "Tarjeta azul registrada correctamente en el servidor"
+      );
     }
-  }
+  };
 
   const resetDataForm = () => {
-    setSelectedTeamId(null)
-    setSelectedPlayerId(null)
-    setMinute(currentMinute.toString())
-  }
+    setSelectedTeamId(null);
+    setSelectedPlayerId(null);
+    setMinute(currentMinute.toString());
+  };
 
   return (
     <Modal visible={isVisible} transparent animationType="slide">
@@ -349,7 +413,9 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
                 <Text style={styles.label}>Equipo:</Text>
                 <Picker
                   selectedValue={selectedTeamId}
-                  onValueChange={(itemValue) => setSelectedTeamId(Number(itemValue))}
+                  onValueChange={(itemValue) =>
+                    setSelectedTeamId(Number(itemValue))
+                  }
                   style={styles.picker}
                   enabled={!isSubmitting}
                 >
@@ -361,7 +427,9 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
                 <Text style={styles.label}>Jugador:</Text>
                 <Picker
                   selectedValue={selectedPlayerId}
-                  onValueChange={(itemValue) => setSelectedPlayerId(Number(itemValue))}
+                  onValueChange={(itemValue) =>
+                    setSelectedPlayerId(Number(itemValue))
+                  }
                   style={styles.picker}
                   enabled={!isSubmitting}
                 >
@@ -409,8 +477,8 @@ const BlueCardModal: React.FC<BlueCardModalProps> = ({
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   modalContainer: {
