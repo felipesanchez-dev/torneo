@@ -28,4 +28,5 @@ android/app/debug.keystore
 
 
 expo-env.d.ts
+.env
 # @end expo-cli
