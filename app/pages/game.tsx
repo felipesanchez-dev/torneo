@@ -1226,9 +1226,6 @@ export default function GameScreen() {
       >
         <SafeAreaView style={[styles.safeArea, styles.loadingContainer]}>
           <ActivityIndicator size="large" color="#FFFFFF" />
-          {/* <Text style={[styles.loadingText, { color: "#FFFFFF" }]}>
-            Cargando datos del partido...
-          </Text> */}
           <Loading />
         </SafeAreaView>
       </LinearGradient>

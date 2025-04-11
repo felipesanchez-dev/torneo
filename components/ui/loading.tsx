@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontSize: 18,
     fontFamily: "Courier",
+    fontWeight: "bold",
   },
   cursor: {
     color: "#fff",
