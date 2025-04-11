@@ -30,24 +30,36 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
 
   useEffect(() => {
     const loadSavedData = async () => {
-      const [first, second, final, isRunning, start] = await Promise.all([
+      const [
+        first,
+        second,
+        final,
+        isRunning,
+        start,
+        savedElapsed, // Funcion para recuperar el tiempo cuando se pausa
+      ] = await Promise.all([
         AsyncStorage.getItem("firstSavedTime"),
         AsyncStorage.getItem("secondSavedTime"),
         AsyncStorage.getItem("finalTime"),
         AsyncStorage.getItem("isActive"),
         AsyncStorage.getItem("startTimestamp"),
+        AsyncStorage.getItem("elapsed"),
       ]);
 
       if (first) setFirstSavedTime(first);
       if (second) setSecondSavedTime(second);
       if (final) setFinalTime(Number(final));
 
+      // cronómetro en ejecución
       if (isRunning === "true" && start) {
-        const startTimestamp = parseInt(start);
+        const startTimestamp = parseInt(start, 10);
         const now = Date.now();
         const secondsPassed = Math.floor((now - startTimestamp) / 1000);
         setElapsed(secondsPassed);
         setIsActive(true);
+      } else if (savedElapsed !== null) {
+        // Si el cronómetrose pasusa se guarda el dato en el cache
+        setElapsed(Number(savedElapsed));
       }
     };
     loadSavedData();
@@ -96,6 +108,7 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
     }
   }, [elapsed]);
 
+  // Función para iniciar el cronómetro
   const startTimer = async () => {
     const start = Date.now().toString();
     await AsyncStorage.setItem("startTimestamp", start);
@@ -103,9 +116,20 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
     setIsActive(true);
   };
 
+  // Función para pausar el cronómetro y guardar el tiempo actual
   const pauseTimer = async () => {
+    await AsyncStorage.setItem("elapsed", elapsed.toString());
     await AsyncStorage.setItem("isActive", "false");
     setIsActive(false);
+  };
+
+  // Función para reanudar el cronómetro
+  const resumeTimer = async () => {
+    //Conservar el tiempo del temporizador y mostrarlo
+    const newStart = Date.now() - elapsed * 1000;
+    await AsyncStorage.setItem("startTimestamp", newStart.toString());
+    await AsyncStorage.setItem("isActive", "true");
+    setIsActive(true);
   };
 
   const addOneMinute = () => {
@@ -122,7 +146,7 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       setFinalTime((prev) => prev + Math.floor(minutesToAdd * 60));
     }
   };
-
+  //Fundacion para eliminar los datos existentes del cache (Todos)
   const resetTimer = async () => {
     setElapsed(0);
     setIsActive(false);
@@ -134,9 +158,9 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       "startTimestamp",
       "finalTime",
       "isActive",
+      "elapsed",
     ]);
   };
-
   return (
     <Animated.View
       entering={FadeInDown.delay(100).duration(50)}
@@ -172,12 +196,16 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
         </View>
       </View>
 
+      {/* estado del cronómetro */}
       {!isActive && elapsed === 0 ? (
         <TouchableOpacity style={styles.startButton} onPress={startTimer}>
           <Text style={styles.buttonText}>Iniciar</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity style={styles.pauseButton} onPress={pauseTimer}>
+        <TouchableOpacity
+          style={styles.pauseButton}
+          onPress={isActive ? pauseTimer : resumeTimer}
+        >
           <Text style={styles.buttonText}>
             {isActive ? "Pausar" : "Reanudar"}
           </Text>
@@ -201,6 +229,7 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
 };
 
 export default Cronometro;
+
 
 const styles = StyleSheet.create({
   container: {
