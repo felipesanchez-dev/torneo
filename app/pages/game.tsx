@@ -1524,8 +1524,8 @@ export default function GameScreen() {
                 {/* Goals */}
                 <View style={styles.statSection}>
                   <View style={styles.statHeader}>
-                    {/* <Trophy size={20} color={theme.textPrimary} /> */}
-                    <Text style={styles.statTitle}>Goles</Text>
+                    {/* <Trophy size={20} color={theme.textPrimary} />  */}
+                    <Text style={styles.statTitle}>RESUMEN DEL PARTIDO</Text>
                   </View>
 
                   <View style={styles.statRow}>
@@ -1969,7 +1969,9 @@ const styles = StyleSheet.create({
   },
   statTeamName: {
     textAlign: "center",
-    fontSize: 12,
+    fontSize: 20,
+    fontWeight: "bold",
+
     minHeight: 40,
     flexGrow: 1,
     maxWidth: "90%",
@@ -2007,7 +2009,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomPadding: {
-    height: 40, 
+    height: 40,
   },
   eventsLoadingContainer: {
     alignItems: "center",
@@ -2022,7 +2024,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flex: 1,
-    justifyContent: "center", 
-    alignItems: "center",     
+    justifyContent: "center",
+    alignItems: "center",
   },
-})
+});
