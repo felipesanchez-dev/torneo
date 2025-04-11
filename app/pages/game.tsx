@@ -173,7 +173,7 @@ export default function GameScreen() {
       const response = await fetch(
         `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${parsedMatchId}`
       );
-      console.log("Variable de respuesta ala API", response);
+      // console.log("Variable de respuesta ala API", response);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
