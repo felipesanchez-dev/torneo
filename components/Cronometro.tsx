@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 type CronometroProps = {
   finalTimeInMinutes?: number;
@@ -137,7 +138,10 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      entering={FadeInDown.delay(100).duration(50)}
+      style={styles.container}
+    >
       <Text style={styles.endTimeText}>Duración del partido: 40'</Text>
       <Text style={styles.timerText}>{formatTime(elapsed)}</Text>
       <Text style={styles.endTimeText}>
@@ -192,7 +196,7 @@ const Cronometro: React.FC<CronometroProps> = ({ finalTimeInMinutes = 20 }) => {
       <TouchableOpacity style={styles.resetButton} onPress={resetTimer}>
         <Text style={styles.buttonText}>Eliminar datos</Text>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 
