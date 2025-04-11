@@ -22,7 +22,7 @@ import { LinearGradient } from "expo-linear-gradient"
 import Entypo from '@expo/vector-icons/Entypo';
 import EditEventModal from "../../components/EditEventModal";
 import Cronometro from "../../components/Cronometro";
-
+import Loading from "../../components/ui/loading";
 
 // Theme colors based on the logo and screenshots
 const theme = {
@@ -1226,9 +1226,10 @@ export default function GameScreen() {
       >
         <SafeAreaView style={[styles.safeArea, styles.loadingContainer]}>
           <ActivityIndicator size="large" color="#FFFFFF" />
-          <Text style={[styles.loadingText, { color: "#FFFFFF" }]}>
+          {/* <Text style={[styles.loadingText, { color: "#FFFFFF" }]}>
             Cargando datos del partido...
-          </Text>
+          </Text> */}
+          <Loading />
         </SafeAreaView>
       </LinearGradient>
     );
@@ -1773,10 +1774,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-  },
+  // loadingText: {
+  //   marginTop: 16,
+  //   fontSize: 16,
+  // },
   errorContainer: {
     justifyContent: "center",
     alignItems: "center",
