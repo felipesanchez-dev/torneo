@@ -23,6 +23,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import EditEventModal from "../../components/EditEventModal";
 import Cronometro from "../../components/Cronometro";
 
+
 // Theme colors based on the logo and screenshots
 const theme = {
   primary: "#FFDE00", // Yellow
@@ -172,6 +173,7 @@ export default function GameScreen() {
       const response = await fetch(
         `https://torneosfutbolbase.com/wp-json/sportspress/v2/events/${parsedMatchId}`
       );
+      console.log("Variable de respuesta ala API", response);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);

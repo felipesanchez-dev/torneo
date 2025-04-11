@@ -1,59 +1,67 @@
-import React, { useEffect, useRef } from 'react'
-import { View, Animated, Easing, StyleSheet } from 'react-native'
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, Animated, StyleSheet } from "react-native";
 
-type Props = {}
+const TypingText = () => {
+  const fullText = "Cargando datos...";
+  const [displayedText, setDisplayedText] = useState("");
+  const cursorOpacity = useRef(new Animated.Value(1)).current;
 
-const Loading = (props: Props) => {
-  const animation = useRef(new Animated.Value(0)).current;
-
+  // Cursor blinking animation
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(animation, {
-          toValue: 1,
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false
-        }),
-        Animated.timing(animation, {
+        Animated.timing(cursorOpacity, {
           toValue: 0,
           duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false
-        })
+          useNativeDriver: true,
+        }),
+        Animated.timing(cursorOpacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
       ])
     ).start();
-  }, [animation]);
+  }, []);
 
-  const widthInterpolation = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%']
-  });
+  // Typing animation
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      setDisplayedText(fullText.slice(0, index + 1));
+      index++;
+      if (index === fullText.length) index = 0;
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <View style={styles.loader}>
-      <Animated.View style={[styles.animatedBar, { width: widthInterpolation }]} />
+    <View style={styles.container}>
+      <Text style={styles.text}>
+        {displayedText}
+        <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>
+          |
+        </Animated.Text>
+      </Text>
     </View>
-  )
-}
+  );
+};
 
-export default Loading
+export default TypingText;
 
 const styles = StyleSheet.create({
-  loader: {
-    width: 130,
-    height: 4,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    borderRadius: 30,
-    overflow: 'hidden',
-    position: 'relative'
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
   },
-  animatedBar: {
-    backgroundColor: '#0071e2',
-    height: '100%',
-    borderRadius: 30,
-    position: 'absolute',
-    left: 0,
-    top: 0
-  }
+  text: {
+    color: "#000000",
+    fontSize: 18,
+    fontFamily: "Courier",
+  },
+  cursor: {
+    color: "#fff",
+  },
 });
