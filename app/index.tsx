@@ -24,7 +24,7 @@ const Page = () => {
             style={styles.title}
             entering={FadeInRight.delay(300).duration(500)}
           >
-            Tu Gestor de Partidos de Microfútbol
+            MICROFUTBOL CAPITAL MUSICAL
           </Animated.Text>
           <Animated.Text
             style={styles.description}
