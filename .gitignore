@@ -16,7 +16,6 @@ android/app/debug.keystore
 
 # Builds
 *.tar.gz
-*.apk
 *.aab
 
 # VSCode
