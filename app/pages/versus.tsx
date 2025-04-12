@@ -147,9 +147,7 @@ export default function VersusScreen() {
       >
         <View style={styles.overlay}>
           <Image
-            source={{
-              uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo%20Musicalia%2025%20amarillo-aME4BgXjwjZeMhPGO4eQcFFjdodPcW.png",
-            }}
+            source={require("@/assets/images/logoOficial.png")}
             style={styles.logo}
             resizeMode="contain"
           />

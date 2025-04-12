@@ -15,7 +15,7 @@ const Page = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ImageBackground
-        source={require("@/assets/images/logo.png")}
+        source={require("@/assets/images/foto.jpg")}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   btn: {
-    backgroundColor: "#854603",
+    backgroundColor: "#a20202",
     paddingVertical: 15,
     marginVertical: 20,
     alignItems: "center",
